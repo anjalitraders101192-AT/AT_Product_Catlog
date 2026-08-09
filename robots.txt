@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anjalitraders101192-at.github.io/AT_Product_Catlog/sitemap.xml
