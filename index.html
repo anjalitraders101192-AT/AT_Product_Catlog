@@ -775,7 +775,9 @@ function toggleFavorite(id,ev){
   var idx=favs.indexOf(id);
   var nowFav = idx===-1; // agar pehle list me nahi tha, ab add ho raha hai (favorite ho raha hai)
   if(idx>-1){ favs.splice(idx,1); } else { favs.push(id); }
-  localStorage.setItem('at_favorites',JSON.stringify(favs));
+
+  // UI update PEHLE karo — taaki chahe localStorage fail ho jaye (kuch strict browser/file:// settings me aisa ho sakta hai),
+  // heart ka color hamesha turant update ho
   var btn=document.querySelector('.fav-btn[data-id="'+id+'"]');
   if(btn){
     btn.classList.toggle('active', nowFav);
@@ -790,7 +792,17 @@ function toggleFavorite(id,ev){
       void btn.offsetWidth; // reflow taaki animation dobara trigger ho
       btn.classList.add('fav-pop');
     }
+  } else {
+    console.warn('toggleFavorite: button not found for id', id);
   }
+
+  try{
+    localStorage.setItem('at_favorites',JSON.stringify(favs));
+  }catch(storageErr){
+    console.error('Favorites save nahi ho payi (localStorage blocked?):', storageErr);
+    showToast('⚠️ Favorite save nahi ho paya is browser me','error');
+  }
+
   if(activeCategory==='__favorites__') filterProducts(); // list se turant hata do agar favorites view khula hai
 }
 function openFavoritesView(btn){
@@ -3494,8 +3506,10 @@ function adminLogout(){
 
   // 6. Touch long-press image save block (mobile)
   // prod-img-wrap ke andar touch karne par browser popup nahi aana chahiye
+  // LEKIN buttons (❤️ favorite, size-chart, etc.) ko is block se exclude karo — warna unka click hi nahi chalega
   document.addEventListener('touchstart', function(e){
     var t = e.target;
+    if(t.closest('button') || t.closest('.fav-btn')) return; // interactive controls ko chhod do
     if(
       t.tagName === 'IMG' ||
       t.closest('.prod-img-wrap') ||
