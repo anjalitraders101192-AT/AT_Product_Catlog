@@ -770,6 +770,7 @@ function getFavorites(){
   try{ return JSON.parse(localStorage.getItem('at_favorites')||'[]'); }catch(e){ return []; }
 }
 function toggleFavorite(id,ev){
+  showToast('💗 Heart clicked! id='+id,'success'); // TEMPORARY DEBUG — isse pata chalega function chal raha hai ya nahi
   if(ev) ev.stopPropagation();
   var favs=getFavorites();
   var idx=favs.indexOf(id);
@@ -2846,10 +2847,7 @@ function renderAnalyticsPanel(){
 
 // ── ADMIN LOGIN — Firebase Authentication ──
 // Credentials Firebase Auth mein hain, code mein nahi
-// ⚠️ TEMPORARY: Login requirement disable ki gayi hai (Manish ki request par)
-// Jab naya username/password Firebase me set ho jaye, is line ko wapas
-// "window._adminLoggedIn = false;" kar dein aur neeche wala auth listener on kar dein.
-window._adminLoggedIn = true;
+window._adminLoggedIn = false;
 window._adminPendingAction = null;
 
 // ── INACTIVITY AUTO LOGOUT ──
@@ -2986,9 +2984,6 @@ function _doInactivityLogout(){
 }
 
 // Firebase Auth state listener — session auto-restore
-// ⚠️ TEMPORARY: Disabled kyunki login requirement hataayi gayi hai.
-// Isse dobara enable karne ke liye niche wala if-block uncomment karein.
-/*
 if(_fbAuth){
   _fbAuth.onAuthStateChanged(function(user){
     if(user){
@@ -2999,7 +2994,6 @@ if(_fbAuth){
     }
   });
 }
-*/
 
 function _onAdminLoginSuccess(){
   sessionStorage.setItem('at_admin_auth','true');
